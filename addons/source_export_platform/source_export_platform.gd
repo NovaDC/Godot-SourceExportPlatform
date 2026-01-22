@@ -1,4 +1,5 @@
 @tool
+@icon("./icon.svg")
 class_name SourceEditorExportPlatform
 extends ToolEditorExportPlatform
 
@@ -8,6 +9,8 @@ extends ToolEditorExportPlatform
 ## source code to be coppied to another directory and optionally compressed.
 ## Usefull for making automatic source code exports.[br]
 ## Requires the NovaTools plugin as a dependency.
+
+var _cached_icon:Texture2D = null
 
 func _path_normalize(raw_path:Variant) -> String:
 	var path:String = ""
@@ -56,14 +59,36 @@ func _has_valid_export_configuration(preset:EditorExportPreset, debug:bool):
 func _get_name():
 	return "SourceExport"
 
-func _get_os_name():
+func _get_os_name() -> String:
 	return "Source"
 
-func _get_logo():
-	var size = Vector2i.ONE * floori(32 * EditorInterface.get_editor_scale())
-	return NovaTools.get_editor_icon_named("FileAccess", size)
+func _get_logo() -> Texture2D:
+	if _cached_icon != null:
+		return _cached_icon
 
-func _get_platform_features():
+	var target_size:Vector2i = Vector2i.ONE * floori(32 * EditorInterface.get_editor_scale())
+
+	var ico := NovaTools.get_editor_icon_named("FileAccess")
+
+	if ico == null or ico.get_size() <= Vector2.ZERO:
+		ico = load("res://addons/source_export_platform/icon.svg") as Texture2D
+
+	if ico == null or ico.get_size() <= Vector2.ZERO:
+		return null
+
+	if ico.get_size() != Vector2(target_size):
+		if not ico.has_method("set_size_override"):
+			var ico_image := ico.get_image()
+			if ico_image == null:
+				return ico
+			ico = ImageTexture.create_from_image(ico_image)
+		ico = ico.duplicate()
+		ico.set_size_override(target_size)
+
+	_cached_icon = ico
+	return ico
+
+func _get_platform_features() -> PackedStringArray:
 	return super._get_platform_features() + PackedStringArray(["sourceonly"])
 
 func _get_export_options():
