@@ -4,9 +4,9 @@ class_name SourceEditorExportPlatform
 extends ToolEditorExportPlatform
 
 ## SourceEditorExportPlatform
-## 
+##
 ## A super simple export plugin for godot that allows for
-## source code to be coppied to another directory and optionally compressed.
+## source code to be copied to another directory and optionally compressed.
 ## Usefull for making automatic source code exports.[br]
 ## Requires the NovaTools plugin as a dependency.
 
@@ -40,7 +40,7 @@ func _path_normalize(raw_path:Variant) -> String:
 
 	return path
 
-func _has_valid_export_configuration(preset:EditorExportPreset, debug:bool):
+func _has_valid_export_configuration(preset:EditorExportPreset, debug:bool) -> bool:
 	if debug:
 		push_error("Debug exports not supported for source.")
 
@@ -56,7 +56,7 @@ func _has_valid_export_configuration(preset:EditorExportPreset, debug:bool):
 
 	return preset_ok
 
-func _get_name():
+func _get_name() -> String:
 	return "SourceExport"
 
 func _get_os_name() -> String:
@@ -91,7 +91,7 @@ func _get_logo() -> Texture2D:
 func _get_platform_features() -> PackedStringArray:
 	return super._get_platform_features() + PackedStringArray(["sourceonly"])
 
-func _get_export_options():
+func _get_export_options() -> Array:
 	return [
 		{
 			"name": "source_directory",
@@ -124,7 +124,7 @@ func _get_export_option_visibility(preset:EditorExportPreset, option:String) -> 
 		_:
 			return true
 
-func _get_export_option_warning(preset:EditorExportPreset, option:StringName):
+func _get_export_option_warning(preset:EditorExportPreset, option:StringName) -> String:
 	match (option):
 		"source_directory":
 			var parsed_source_dir := _path_normalize(preset.get_or_env("source_directory", ""))
@@ -135,14 +135,15 @@ func _get_export_option_warning(preset:EditorExportPreset, option:StringName):
 			if not parsed_source_dir.begins_with(ProjectSettings.globalize_path("res://").rstrip("/")):
 				warning_strings.append("Source directory not local to project.")
 			if DirAccess.dir_exists_absolute(parsed_source_dir):
-				if (DirAccess.get_directories_at(parsed_source_dir) + DirAccess.get_files_at(parsed_source_dir)).is_empty():
-					warning_strings.append("Source directory empty.")
+				if DirAccess.get_directories_at(parsed_source_dir).is_empty():
+					if DirAccess.get_files_at(parsed_source_dir).is_empty():
+						warning_strings.append("Source directory empty.")
 			return "\n".join(warning_strings)
 
 		_:
 			return ""
 
-func _export_hook(preset: EditorExportPreset, path:String):
+func _export_hook(preset:EditorExportPreset, path:String) -> int:
 	var zipped := bool(preset.get_or_env("zipped", ""))
 
 	path = _path_normalize(path)
@@ -179,16 +180,12 @@ func _export_hook(preset: EditorExportPreset, path:String):
 				err = FileAccess.get_open_error()
 			file.close()
 
-	if err != OK:
-		return err
-
-	if preset.get_or_env("show_after", ""):
+	if err == OK and preset.get_or_env("show_after", ""):
 		err = OS.shell_show_in_file_manager(path, false)
 
 	return err
 
-func _get_binary_extensions(preset: EditorExportPreset):
+func _get_binary_extensions(preset: EditorExportPreset) -> PackedStringArray:
 	if preset.get_or_env("zipped", ""):
 		return PackedStringArray(["zip"])
-	else:
-		return PackedStringArray()
+	return PackedStringArray()
