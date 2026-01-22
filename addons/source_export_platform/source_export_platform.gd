@@ -77,14 +77,27 @@ func _get_export_options():
 		{
 			"name": "zipped",
 			"type": TYPE_BOOL,
-			"default_value": true
+			"default_value": true,
+			"update_visibility": true,
 		},
 		{
 			"name": "show_after",
 			"type": TYPE_BOOL,
 			"default_value": true
 		},
+		{
+			"name": "add_gdignore",
+			"type": TYPE_BOOL,
+			"default_value": true
+		},
 	] + super._get_export_options()
+
+func _get_export_option_visibility(preset:EditorExportPreset, option:String) -> bool:
+	match (option):
+		"add_gdignore":
+			return not preset.get_or_env("zipped", "")
+		_:
+			return true
 
 func _get_export_option_warning(preset:EditorExportPreset, option:StringName):
 	match (option):
@@ -132,6 +145,14 @@ func _export_hook(preset: EditorExportPreset, path:String):
 													f,
 													Vector2i(250, 100)
 													)
+
+	if (not zipped) and preset.get_or_env("add_gdignore", ""):
+		var gdignore_path := path.path_join(".gdignore")
+		if DirAccess.dir_exists_absolute(path) and not FileAccess.file_exists(gdignore_path):
+			var file := FileAccess.open(gdignore_path, FileAccess.WRITE)
+			if file == null:
+				err = FileAccess.get_open_error()
+			file.close()
 
 	if err != OK:
 		return err
