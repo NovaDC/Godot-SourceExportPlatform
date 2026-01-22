@@ -79,6 +79,11 @@ func _get_export_options():
 			"type": TYPE_BOOL,
 			"default_value": true
 		},
+		{
+			"name": "show_after",
+			"type": TYPE_BOOL,
+			"default_value": true
+		},
 	] + super._get_export_options()
 
 func _get_export_option_warning(preset:EditorExportPreset, option:StringName):
@@ -122,11 +127,19 @@ func _export_hook(preset: EditorExportPreset, path:String):
 		f = NovaTools.compress_zip_async.bind(source_dir, path)
 	else:
 		f = NovaTools.copy_recursive.bind(source_dir, path)
-	
-	return await NovaTools.show_wait_window_while_async("[center]Copying...[/center]",
+
+	var err:int = await NovaTools.show_wait_window_while_async("[center]Copying...[/center]",
 													f,
 													Vector2i(250, 100)
-												   )
+													)
+
+	if err != OK:
+		return err
+
+	if preset.get_or_env("show_after", ""):
+		err = OS.shell_show_in_file_manager(path, false)
+
+	return err
 
 func _get_binary_extensions(preset: EditorExportPreset):
 	if preset.get_or_env("zipped", ""):
