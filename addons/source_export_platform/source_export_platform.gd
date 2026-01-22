@@ -5,9 +5,9 @@ extends ToolEditorExportPlatform
 
 ## SourceEditorExportPlatform
 ##
-## A super simple export plugin for godot that allows for
-## source code to be copied to another directory and optionally compressed.
-## Usefull for making automatic source code exports.[br]
+## A simple export plugin that allows for the complete
+## source code to be copied to another directory or compressed into a zip file.[br]
+## Intended for automatic source code exports.[br]
 ## Requires the NovaTools plugin as a dependency.
 
 var _cached_icon:Texture2D = null

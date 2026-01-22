@@ -10,10 +10,15 @@ config_version=5
 
 [application]
 
-config/name="Source Export Platform"
-config/version="1.0.0.0"
+config/name="Godot-SourceExportPlatform"
+config/version="v1.1.0.0"
 config/features=PackedStringArray("4.5", "GL Compatibility")
+boot_splash/image="uid://6rqsxod4dol0"
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/source_export_platform/plugin.cfg")
 
 [rendering]
 

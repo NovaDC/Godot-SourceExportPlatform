@@ -1,2 +1,8 @@
-# Godot-SourceExprotPlatform
- A super simple export plugin for godot that allows for source code to be coppied to another directory and optionally compressed. Usefull for making automatic source code exports. Requires the NovaTools plugin as a dependency.
+# Godot-SourceExportPlatform
+
+A simple export plugin for godot that allows for the complete source code to be copied to another directory or compressed into a zip file.
+Intended for automatic source code exports.
+
+Requires the [NovaTools](https://github.com/NovaDC/Godot-Novatools "NovaTools Github Repository") plugin as a dependency.
+
+![The SourceExportPlatform icon](./icon.png "Icon")
