@@ -57,7 +57,7 @@ func _has_valid_export_configuration(preset:EditorExportPreset, debug:bool) -> b
 	return preset_ok
 
 func _get_name() -> String:
-	return "SourceExport"
+	return "Source"
 
 func _get_os_name() -> String:
 	return "Source"
